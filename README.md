@@ -27,7 +27,11 @@ $classMap = $scanner->mapFileToClass();
 
 The `$classMap` variable will then hold a `Map<string,string>` object that maps class names (with full namespace) to the files in which the class is defined.
 
+# Assumptions
+
+This class assumes you are following the practice of one class per file.  The scanner will stop searching once it has found the first class name in a file.
+
 Thanks
-=====
+======
 
 The file parsing algorithm was heavily influenced by the one used in [HackPack/HackUnit](https://github.com/HackPack/HackUnit).
