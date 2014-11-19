@@ -30,4 +30,4 @@ The `$classMap` variable will then hold a `Map<string,string>` object that maps 
 Thanks
 =====
 
-The file parsing algorithm was heavily influenced by 
+The file parsing algorithm was heavily influenced by the one used in [HackPack/HackUnit](https://github.com/HackPack/HackUnit).
