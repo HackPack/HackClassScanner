@@ -15,8 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "kilahm\\Scanner\\" : "src/",
-            "kilahm\\Test\\" : "Test/"
+            "kilahm\\Scanner\\" : "src/"
         }
     },
     "bin" : ["bin/scan"]
