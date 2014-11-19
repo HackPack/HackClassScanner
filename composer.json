@@ -1,0 +1,21 @@
+{
+    "name": "kilahm/hack-class-scanner",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Isaac Leinweber",
+            "email": "brotchen@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "hackpack/hackunit": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "kilahm\\Scanner\\" : "src/",
+            "kilahm\\Test\\" : "Test/"
+        }
+    }
+}

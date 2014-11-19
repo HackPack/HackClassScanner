@@ -1,0 +1,6 @@
+<?hh // strict
+
+class ClassA
+{
+
+}
