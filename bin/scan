@@ -31,4 +31,6 @@ if($argc !== 2 || ! is_dir($argv[1])) {
 
 use kilahm\Scanner\ClassScanner;
 
-ClassScanner::fromCli($argv)->mapFileToClass();
+foreach(ClassScanner::fromCli($argv)->mapFileToClass() as $class => $path) {
+    echo "$class => $path" . PHP_EOL;
+}

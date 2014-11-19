@@ -27,9 +27,17 @@ $classMap = $scanner->mapFileToClass();
 
 The `$classMap` variable will then hold a `Map<string,string>` object that maps class names (with full namespace) to the files in which the class is defined.
 
-# Assumptions
+## Assumptions
 
 This class assumes you are following the practice of one class per file.  The scanner will stop searching once it has found the first class name in a file.
+
+## Helper Script
+
+An executable hack script is included in this library if you simply want to view a list of classes defined in a particular directory.
+
+```bash
+$ vendor/bin/scan <path to directory>
+```
 
 Thanks
 ======
