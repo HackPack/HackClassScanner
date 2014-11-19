@@ -2,6 +2,7 @@
     "name": "kilahm/hack-class-scanner",
     "license": "MIT",
     "type": "library",
+    "keywords": ['hack', 'hhvm', 'scan', 'ClassScanner', 'autoload'],
     "authors": [
         {
             "name": "Isaac Leinweber",
