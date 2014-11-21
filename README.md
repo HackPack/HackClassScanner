@@ -22,10 +22,12 @@ To use the class, simply instantiate it with a set of base directories to scan a
 use kilahm\Scanner\ClassScanner;
 
 $scanner = new ClassScanner(Set{‘directory/to/scan’, ‘other/directory’}, Set{‘directory/to/scan/ignore’});
-$classMap = $scanner->mapFileToClass();
+$classMap = $scanner->mapClassToFile();
+$classAndInterfaceMap = $scanner->mapClassOrInterfaceToFile();
 ```
 
 The `$classMap` variable will then hold a `Map<string,string>` object that maps class names (with full namespace) to the files in which the class is defined.
+The `$classAndInterfaceMap` will be the same as `$classMap` except it will include interfaces as well as classes.
 
 ## Assumptions
 

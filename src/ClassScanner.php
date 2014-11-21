@@ -5,9 +5,13 @@ namespace kilahm\Scanner;
 use Exception;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
+use SplFileObject;
 
 final class ClassScanner
 {
+    private bool $findClasses = false;
+    private bool $findInterfaces = false;
+
     protected static array<string> $longOpts = [
         'exclude:',
     ];
@@ -37,7 +41,21 @@ final class ClassScanner
             ->map($p ==> realpath($p));
     }
 
-    public function mapFileToClass() : Map<string,string>
+    public function mapClassToFile() : Map<string,string>
+    {
+        $this->findClasses = true;
+        $this->findInterfaces = false;
+        return $this->map();
+    }
+
+    public function mapClassOrInterfaceToFile() : Map<string,string>
+    {
+        $this->findClasses = true;
+        $this->findInterfaces = true;
+        return $this->map();
+    }
+
+    private function map() : Map<string,string>
     {
         $classMap = Map{};
         foreach($this->paths as $basePath) {
@@ -61,12 +79,12 @@ final class ClassScanner
         return $map;
     }
 
-    private function parseFile(\SplFileObject $file) : string
+    private function parseFile(SplFileObject $file) : string
     {
         // incrementally break contents into tokens
         $namespace = $class = $buffer = '';
         $i = 0;
-        while (!$class) {
+        while ($class === '') {
             if ($file->eof()) {
                 return '';
             }
@@ -87,6 +105,7 @@ final class ClassScanner
                 //search for a namespace
                 if ($tokens[$i][0] === \T_NAMESPACE) {
                     $namespace = '';
+                    $stop = false;
                     for ($j = $i + 1; $j < count($tokens); $j++) {
                         if ($tokens[$j][0] === \T_STRING) {
                             $namespace .= '\\' . (string) $tokens[$j][1];
@@ -97,16 +116,25 @@ final class ClassScanner
                 }
 
                 //search for the class name
-                if ($tokens[$i][0] === \T_CLASS) {
+                if (
+                    ($this->findClasses && $tokens[$i][0] === \T_CLASS) ||
+                    ($this->findInterfaces && $tokens[$i][0] === \T_INTERFACE)
+                ) {
                     for ($j = $i + 1; $j < count($tokens); $j++) {
-                        if ($tokens[$j] === '{') {
+                        switch($tokens[$j]) {
+                        case '{':
+                            // We found one!
                             $class = $tokens[$i + 2][1];
+                            break;
+                        case '}':
+                        case ';':
+                            // Looks like ::class inside of a context
                             break;
                         }
                     }
                 }
 
-                if($class) {
+                if($class !== '') {
                     // Stop looking for the class name after it is found
                     break;
                 }
