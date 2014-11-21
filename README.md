@@ -21,7 +21,10 @@ To use the class, simply instantiate it with a set of base directories to scan a
 ```php
 use kilahm\Scanner\ClassScanner;
 
-$scanner = new ClassScanner(Set{‘directory/to/scan’, ‘other/directory’}, Set{‘directory/to/scan/ignore’});
+$scanner = new ClassScanner(
+  Set{‘directory/to/scan’, ‘other/directory’},
+  Set{‘other/directory/to/ignore’}
+);
 $classMap = $scanner->mapClassToFile();
 $classAndInterfaceMap = $scanner->mapClassOrInterfaceToFile();
 ```
