@@ -3,6 +3,8 @@ HackClassScanner
 
 A class that recursively scans a directory for hack classes.
 
+[![Build Status](https://travis-ci.org/kilahm/HackClassScanner.svg)](https://travis-ci.org/kilahm/HackClassScanner)
+
 Installation
 ===========
 Add the following line to your `composer.json` file in the `require` section.
