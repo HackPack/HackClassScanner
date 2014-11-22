@@ -8,4 +8,4 @@ before_script:
     - composer install --prefer-source
 
 script:
-    - vendor/bin/hackunit  Tests/ --exclude=Tests/Fixtures/
+    - vendor/bin/hackunit  Test/ --exclude=Test/Fixtures/
