@@ -16,10 +16,11 @@ final class ClassScanner
         'exclude:',
     ];
 
-    public static function fromCli(array<string> $argv): this
+    public static function fromCli(Vector<string> $argv): this
     {
         // The first value of argv is the script name
-        $paths = Set::fromItems($argv);
+        $argv->removeKey(0);
+        $paths = $argv->toSet();
 
         $options = getopt('', static::$longOpts);
         if (array_key_exists('exclude', $options)) {
