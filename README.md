@@ -42,7 +42,7 @@ This class assumes you are following the practice of one class per file.  The sc
 An executable hack script is included in this library if you simply want to view a list of classes defined in a particular directory.
 
 ```bash
-$ vendor/bin/scan <path to directory>
+$ vendor/bin/scan path/to/scan [other/path ...] [--exclude=”path/to/exclude [other/path/to/exclude]”]
 ```
 
 Thanks

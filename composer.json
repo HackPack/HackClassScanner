@@ -9,7 +9,9 @@
             "email": "brotchen@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "kilahm/hack-clio": "~0.1"
+    },
     "require-dev": {
         "hackpack/hackunit": "dev-master"
     },

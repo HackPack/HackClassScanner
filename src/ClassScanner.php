@@ -12,26 +12,6 @@ final class ClassScanner
     private bool $findClasses = false;
     private bool $findInterfaces = false;
 
-    protected static array<string> $longOpts = [
-        'exclude:',
-    ];
-
-    public static function fromCli(Vector<string> $argv): this
-    {
-        // The first value of argv is the script name
-        $argv->removeKey(0);
-        $paths = $argv->toSet();
-
-        $options = getopt('', static::$longOpts);
-        if (array_key_exists('exclude', $options)) {
-            $excludes = Set::fromItems(preg_split('/\s+/', $options['exclude']));
-        } else {
-            $excludes = Set{};
-        }
-
-        return new static($paths, $excludes);
-    }
-
     public function __construct(public Set<string> $paths, public Set<string> $excludes = Set{})
     {
         $this->paths = $paths

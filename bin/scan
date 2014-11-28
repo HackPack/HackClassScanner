@@ -25,12 +25,20 @@ do {
     }
 } while(true);
 
-if($argc !== 2 || ! is_dir($argv[1])) {
-    die('scan <path to scan route>');
-}
 
 use kilahm\Scanner\ClassScanner;
+use kilahm\Clio\Clio;
+use kilahm\Clio\Output\CliFormat;
 
-foreach(ClassScanner::fromCli($argv)->mapFileToClass() as $class => $path) {
+$clio = Clio::fromCli();
+
+$formatter = CliFormat::makeWithDefaults();
+
+$excludeOpt = $clio->opt('exclude')->aka('e')->aka('excludes')->aka('skip')
+    ->describedAs('Space delimited list of directories to skip');
+
+$scanner = new ClassScanner($clio->getArgVals()->toSet(), Set::fromItems(explode(' ', $excludeOpt->getVal())));
+
+foreach($scanner->mapClassToFile() as $class => $path) {
     echo "$class => $path" . PHP_EOL;
 }
