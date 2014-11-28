@@ -1,9 +1,8 @@
 HackClassScanner
 ================
+[![Build Status](https://travis-ci.org/kilahm/HackClassScanner.svg)](https://travis-ci.org/kilahm/HackClassScanner) [![HHVM Status](http://hhvm.h4cc.de/badge/kilahm/hack-class-scanner.svg)](http://hhvm.h4cc.de/package/kilahm/hack-class-scanner)
 
 A class that recursively scans a directory for hack classes.
-
-[![Build Status](https://travis-ci.org/kilahm/HackClassScanner.svg)](https://travis-ci.org/kilahm/HackClassScanner)
 
 Installation
 ===========
