@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "kilahm/hack-clio": "~0.1"
+        "kilahm/hack-clio": "~1.0"
     },
     "require-dev": {
         "hackpack/hackunit": "dev-master"

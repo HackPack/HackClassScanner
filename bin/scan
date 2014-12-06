@@ -29,16 +29,31 @@ do {
 use kilahm\Scanner\ClassScanner;
 use kilahm\Clio\Clio;
 use kilahm\Clio\Output\CliFormat;
+use kilahm\Clio\Enum\ForegroundCode;
 
 $clio = Clio::fromCli();
 
-$formatter = CliFormat::makeWithDefaults();
-
+$clio->arg('path')->describedAs('Base path to scan.');
 $excludeOpt = $clio->opt('exclude')->aka('e')->aka('excludes')->aka('skip')
+    ->withManyValues(Vector{})
     ->describedAs('Space delimited list of directories to skip');
+$colorOpt = $clio->opt('with-colors')->aka('c');
 
-$scanner = new ClassScanner($clio->getArgVals()->toSet(), Set::fromItems(explode(' ', $excludeOpt->getVal())));
+$scanner = new ClassScanner($clio->getArgVals()->toSet(), $excludeOpt->getValueList()->toSet());
+
+$showColors = $colorOpt->wasPresent();
+$map = $scanner->mapClassToFile();
+
+$classLen = 0;
+foreach($map as $class => $file) {
+    $classLen = max($classLen, strlen($class));
+}
 
 foreach($scanner->mapClassToFile() as $class => $path) {
+    $class = str_pad($class, $classLen, ' ', STR_PAD_RIGHT);
+    if($showColors){
+        $class = $clio->format($class)->fg(ForegroundCode::blue);
+        $path = $clio->format($path)->fg(ForegroundCode::yellow);
+    }
     echo "$class => $path" . PHP_EOL;
 }
