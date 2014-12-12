@@ -45,7 +45,7 @@ final class ClassScanner
         return $classMap;
     }
 
-    private function findFilesRecursive(string $path, Map<string,string> $map) : Map<string,string>
+    private function findFilesRecursive(string $path, Map<string,string> $map) : void
     {
         foreach(new FileSystemIterator($path) as $finfo) {
             if($finfo->isDir() && ! $this->excludes->contains($finfo->getRealPath())) {
@@ -57,7 +57,6 @@ final class ClassScanner
                 }
             }
         }
-        return $map;
     }
 
     private function parseFile(SplFileObject $file) : string
