@@ -11,6 +11,8 @@ final class ClassScanner
 {
     private bool $findClasses = false;
     private bool $findInterfaces = false;
+    private Vector<(function (string) : bool)> $fileFilters = Vector{};
+    private Vector<(function (string) : bool)> $classFilters = Vector{};
 
     public function __construct(public Set<string> $paths, public Set<string> $excludes = Set{})
     {
@@ -20,6 +22,30 @@ final class ClassScanner
         $this->excludes = $excludes
             ->filter($p ==> $p !== '' && is_dir($p))
             ->map($p ==> realpath($p));
+    }
+
+    public function addClassNameFilter((function (string) : bool) $filter) : this
+    {
+        $this->classFilters->add($filter);
+        return $this;
+    }
+
+    public function addClassNameFilters(Traversable<(function (string) : bool)> $filters) : this
+    {
+        $this->classFilters->addAll($filters);
+        return $this;
+    }
+
+    public function addFileNameFilter((function (string) : bool) $filter) : this
+    {
+        $this->fileFilters->add($filter);
+        return $this;
+    }
+
+    public function addFileNameFilters(Traversable<(function (string) : bool)> $filters) : this
+    {
+        $this->fileFilters->addAll($filters);
+        return $this;
     }
 
     public function mapClassToFile() : Map<string,string>
@@ -45,12 +71,32 @@ final class ClassScanner
         return $classMap;
     }
 
+    private function filterClass(string $className) : bool
+    {
+        foreach($this->classFilters as $filter) {
+            if( ! $filter($className)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function filterFile(string $fileName) : bool
+    {
+        foreach($this->fileFilters as $filter) {
+            if( ! $filter($fileName)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     private function findFilesRecursive(string $path, Map<string,string> $map) : void
     {
         foreach(new FileSystemIterator($path) as $finfo) {
             if($finfo->isDir() && ! $this->excludes->contains($finfo->getRealPath())) {
                 $this->findFilesRecursive($finfo->getRealPath(), $map);
-            } elseif($finfo->isFile()) {
+            } elseif($finfo->isFile() && $this->filterFile($finfo->getRealPath())) {
                 $className = $this->parseFile($finfo->openFile());
                 if($className !== '') {
                     $map[$this->parseFile($finfo->openFile())] = $finfo->getRealPath();
@@ -66,10 +112,11 @@ final class ClassScanner
         $i = 0;
         while ($class === '') {
             if ($file->eof()) {
+                // No class to find
                 return '';
             }
-            // Load 10 lines at a time
-            for($newline = 0; $newline < 10; $newline++) {
+            // Load 30 lines at a time
+            for($newline = 0; $newline < 30; $newline++) {
                 $buffer .= $file->fgets();
             }
 
@@ -101,14 +148,13 @@ final class ClassScanner
                     ($this->findInterfaces && $tokens[$i][0] === \T_INTERFACE)
                 ) {
                     for ($j = $i + 1; $j < count($tokens); $j++) {
-                        switch($tokens[$j]) {
-                        case '{':
+                        if($tokens[$j] === '{') {
                             // We found one!
                             $class = $tokens[$i + 2][1];
                             break;
-                        case '}':
-                        case ';':
-                            // Looks like ::class inside of a context
+                        } elseif($tokens[$j] === '}' || $tokens[$j] === ';') {
+                            // We found ::class inside of a context
+                            $class = '';
                             break;
                         }
                     }
@@ -121,6 +167,10 @@ final class ClassScanner
             }
         }
 
-        return $namespace . '\\' . $class;
+        $fullname = $namespace . '\\' . $class;
+        if($this->filterClass($fullname)){
+            return $fullname;
+        }
+        return '';
     }
 }

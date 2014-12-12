@@ -11,10 +11,12 @@ class ClassScannerTest extends TestCase
         '\ClassA' => __DIR__ . '/Fixtures/ClassA.php',
         '\kilahm\Random\NS\ClassB' => __DIR__ . '/Fixtures/SubSpace/ClassB.php',
         '\kilahm\RandomOther\NS\ClassC' => __DIR__ . '/Fixtures/SubSpace/ClassC.php',
+        '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
     private Map<string,string> $topClasses = Map{
         '\ClassA' => __DIR__ . '/Fixtures/ClassA.php',
+        '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
     private Map<string,string> $allClassesAndInterfaces = Map{
@@ -22,6 +24,7 @@ class ClassScannerTest extends TestCase
         '\kilahm\Random\NS\ClassB' => __DIR__ . '/Fixtures/SubSpace/ClassB.php',
         '\kilahm\RandomOther\NS\ClassC' => __DIR__ . '/Fixtures/SubSpace/ClassC.php',
         '\IfaceNS\MyInterface' => __DIR__ . '/Fixtures/InterfaceA.php',
+        '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
     public function testScannerFindsAllClasses() : void
@@ -40,5 +43,19 @@ class ClassScannerTest extends TestCase
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
         $this->expect($scan->mapClassOrInterfaceToFile())->toEqual($this->allClassesAndInterfaces);
+    }
+
+    public function testClassFilter() : void
+    {
+        $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
+        $scan->addClassNameFilter($className ==> $className === '\ClassA');
+        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
+    }
+
+    public function testFileFilter() : void
+    {
+        $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
+        $scan->addFileNameFilter($fileName ==> $fileName === __DIR__ . '/Fixtures/ClassA.php');
+        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
     }
 }
