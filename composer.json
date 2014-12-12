@@ -1,5 +1,6 @@
 {
     "name": "kilahm/hack-class-scanner",
+    "description": "Recursively scan a directory for hack classes and/or interfaces",
     "license": "MIT",
     "type": "library",
     "keywords": ["hack", "hhvm", "scan", "ClassScanner", "autoload"],
@@ -9,9 +10,6 @@
             "email": "brotchen@gmail.com"
         }
     ],
-    "require": {
-        "kilahm/hack-clio": "~1.0"
-    },
     "require-dev": {
         "hackpack/hackunit": "dev-master"
     },
@@ -19,6 +17,5 @@
         "psr-4": {
             "kilahm\\Scanner\\" : "src/"
         }
-    },
-    "bin" : ["bin/scan"]
+    }
 }

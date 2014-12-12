@@ -33,17 +33,25 @@ $classAndInterfaceMap = $scanner->mapClassOrInterfaceToFile();
 The `$classMap` variable will then hold a `Map<string,string>` object that maps class names (with full namespace) to the files in which the class is defined.
 The `$classAndInterfaceMap` will be the same as `$classMap` except it will include interfaces as well as classes.
 
+## Filters
+
+You can add filters to the scanned files based on the name of the class or the name of the file. A filter must be a closure with a signature of `function(string) : bool`.
+The input for a class filter is the name of the class including the namespace.  The input for a file filter is the name of the file including the full path (via `realpath`).
+
+```php
+$includes = Set{...};
+$excludes = Set{...};
+$scanner = new ClassScanner($includes, $excludes);
+$classFilter = $className ==> preg_match(‘/pattern/’, $className);
+$fileFilter = $fileName ==> preg_match(‘/pattern/’, $fileName);
+$scanner->addClassNameFilter($classFilter);
+$scanner->addFileNameFilter($fileFilter);
+$classMap = $scanner->mapClassToFile();
+```
+
 ## Assumptions
 
 This class assumes you are following the practice of one class per file.  The scanner will stop searching once it has found the first class name in a file.
-
-## Helper Script
-
-An executable hack script is included in this library if you simply want to view a list of classes defined in a particular directory.
-
-```bash
-$ vendor/bin/scan path/to/scan [other/path ...] [--exclude=”path/to/exclude [other/path/to/exclude]”]
-```
 
 Thanks
 ======
