@@ -35,8 +35,9 @@ The `$classAndInterfaceMap` will be the same as `$classMap` except it will inclu
 
 ## Filters
 
-You can add filters to the scanned files based on the name of the class or the name of the file. A filter must be a closure with a signature of `function(string) : bool`.
+You can filter the result files based on the name of the class or the name of the file. A filter must be a closure with a signature of `function(string) : bool`.
 The input for a class filter is the name of the class including the namespace.  The input for a file filter is the name of the file including the full path (via `realpath`).
+If all registered filter functions return `true` for a particular file or class name, the file will be scanned for a class and the class name will appear in the output, respectively.
 
 ```php
 $includes = Set{...};

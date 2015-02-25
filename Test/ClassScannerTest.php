@@ -60,4 +60,19 @@ class ClassScannerTest extends TestCase
         $scan->addFileNameFilter($fileName ==> $fileName === __DIR__ . '/Fixtures/ClassA.php');
         $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
     }
+
+    public function testScannerFindsOneFile() : void
+    {
+        $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/text.txt'});
+        $this->expect($scan->mapClassToFile())->toEqual(Map{'\TextClass' => __DIR__ . '/Fixtures/text.txt'});
+    }
+
+    public function testScannerExcludesOneFile() : void
+    {
+        $scan = new ClassScanner(Set{__DIR__ . '/Fixtures'}, Set{
+            __DIR__ . '/Fixtures/SubSpace',
+            __DIR__ . '/Fixtures/text.txt'
+        });
+        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
+    }
 }

@@ -17,10 +17,10 @@ final class ClassScanner
     public function __construct(public Set<string> $paths, public Set<string> $excludes = Set{})
     {
         $this->paths = $paths
-            ->filter($p ==> $p !== '' && is_dir($p))
+            ->filter($p ==> $p !== '' && (is_dir($p) || is_file($p)))
             ->map($p ==> realpath($p));
         $this->excludes = $excludes
-            ->filter($p ==> $p !== '' && is_dir($p))
+            ->filter($p ==> $p !== '' && (is_dir($p) || is_file($p)))
             ->map($p ==> realpath($p));
     }
 
@@ -93,13 +93,30 @@ final class ClassScanner
 
     private function findFilesRecursive(string $path, Map<string,string> $map) : void
     {
+        if(
+            is_file($path) &&
+            ! $this->excludes->contains($path) &&
+            $this->filterFile($path)
+        ) {
+            // Path given is already a file... no need to recurse into the directory
+            $className = $this->parseFile(new SplFileObject($path));
+            if($className !== '') {
+                $map[$className] = $path;
+            }
+            return;
+        }
+
         foreach(new FileSystemIterator($path) as $finfo) {
             if($finfo->isDir() && ! $this->excludes->contains($finfo->getRealPath())) {
                 $this->findFilesRecursive($finfo->getRealPath(), $map);
-            } elseif($finfo->isFile() && $this->filterFile($finfo->getRealPath())) {
+            } elseif(
+                $finfo->isFile() &&
+                ! $this->excludes->contains($finfo->getRealPath()) &&
+                $this->filterFile($finfo->getRealPath())
+            ) {
                 $className = $this->parseFile($finfo->openFile());
                 if($className !== '') {
-                    $map[$this->parseFile($finfo->openFile())] = $finfo->getRealPath();
+                    $map[$className] = $finfo->getRealPath();
                 }
             }
         }
