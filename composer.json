@@ -7,11 +7,12 @@
     "authors": [
         {
             "name": "Isaac Leinweber",
-            "email": "brotchen@gmail.com"
+            "email": "brotchen@gmail.com",
+            "role": "Developer"
         }
     ],
     "require-dev": {
-        "hackpack/hackunit": "dev-master"
+        "hackpack/hackunit": "0.3.*"
     },
     "autoload": {
         "psr-4": {

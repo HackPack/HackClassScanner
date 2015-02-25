@@ -131,13 +131,14 @@ final class ClassScanner
 
                 //search for a namespace
                 if ($tokens[$i][0] === \T_NAMESPACE) {
-                    $namespace = '';
-                    $stop = false;
                     for ($j = $i + 1; $j < count($tokens); $j++) {
-                        if ($tokens[$j][0] === \T_STRING) {
-                            $namespace .= '\\' . (string) $tokens[$j][1];
-                        } else if ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                        // Namespace ends on { or ;
+                        if (is_array($tokens[$j])) {
+                            $namespace .= trim((string) $tokens[$j][1]);
+                        } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
                             break;
+                        } else {
+                            $namespace .= (string) $tokens[$j];
                         }
                     }
                 }
@@ -167,7 +168,11 @@ final class ClassScanner
             }
         }
 
-        $fullname = $namespace . '\\' . $class;
+        if($namespace !== '' && substr($namespace, 0, 1) !== '\\') {
+            $namespace = '\\' . $namespace;
+        }
+
+        $fullname = implode('\\', [$namespace, $class]);
         if($this->filterClass($fullname)){
             return $fullname;
         }

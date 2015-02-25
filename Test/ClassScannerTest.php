@@ -11,6 +11,7 @@ class ClassScannerTest extends TestCase
         '\ClassA' => __DIR__ . '/Fixtures/ClassA.php',
         '\kilahm\Random\NS\ClassB' => __DIR__ . '/Fixtures/SubSpace/ClassB.php',
         '\kilahm\RandomOther\NS\ClassC' => __DIR__ . '/Fixtures/SubSpace/ClassC.php',
+        '\kilahm\Test\In\With\More\In\Parts\In\In' => __DIR__ . '/Fixtures/SubSpace/ClassIn.php',
         '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
@@ -21,9 +22,10 @@ class ClassScannerTest extends TestCase
 
     private Map<string,string> $allClassesAndInterfaces = Map{
         '\ClassA' => __DIR__ . '/Fixtures/ClassA.php',
+        '\IfaceNS\MyInterface' => __DIR__ . '/Fixtures/InterfaceA.php',
         '\kilahm\Random\NS\ClassB' => __DIR__ . '/Fixtures/SubSpace/ClassB.php',
         '\kilahm\RandomOther\NS\ClassC' => __DIR__ . '/Fixtures/SubSpace/ClassC.php',
-        '\IfaceNS\MyInterface' => __DIR__ . '/Fixtures/InterfaceA.php',
+        '\kilahm\Test\In\With\More\In\Parts\In\In' => __DIR__ . '/Fixtures/SubSpace/ClassIn.php',
         '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
