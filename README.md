@@ -1,30 +1,30 @@
 HackClassScanner
 ================
-[![Build Status](https://travis-ci.org/kilahm/HackClassScanner.svg)](https://travis-ci.org/kilahm/HackClassScanner) [![HHVM Status](http://hhvm.h4cc.de/badge/kilahm/hack-class-scanner.svg)](http://hhvm.h4cc.de/package/kilahm/hack-class-scanner)
+[![Build Status](https://travis-ci.org/HackPack/HackClassScanner.svg)](https://travis-ci.org/HackPack/HackClassScanner)
+[![HHVM Status](http://hhvm.h4cc.de/badge/hackpack/hack-class-scanner.svg)](http://hhvm.h4cc.de/package/hackpack/hack-class-scanner)
 
 A class that recursively scans a directory for hack classes.
 
 Installation
 ===========
-Add the following line to your `composer.json` file in the `require` section.
 
-```
-“kilahm/hack-class-scanner”: “dev-master”
-```
+Install [Composer](https://getcomposer.org/download/) then use the following in your project directory:
 
-Then run `composer update`.
+```bash
+composer require hackpack/hack-class-scanner
+```
 
 Use
 ===
 
-To use the class, simply instantiate it with a set of base directories to scan and a set of directories to ignore.
+To use the class, simply instantiate it with a set of files/base directories to scan and a set of files/directories to ignore.
 
 ```php
-use kilahm\Scanner\ClassScanner;
+use HackPack\Scanner\ClassScanner;
 
 $scanner = new ClassScanner(
-  Set{‘directory/to/scan’, ‘other/directory’},
-  Set{‘other/directory/to/ignore’}
+  Set{‘directory/to/scan’, ‘other/directory’, ‘file/to/scan.txt’},
+  Set{‘other/directory/to/ignore’, ‘other/directory/file_to_ignore.txt’}
 );
 $classMap = $scanner->mapClassToFile();
 $classAndInterfaceMap = $scanner->mapClassOrInterfaceToFile();
@@ -40,6 +40,8 @@ The input for a class filter is the name of the class including the namespace.  
 If all registered filter functions return `true` for a particular file or class name, the file will be scanned for a class and the class name will appear in the output, respectively.
 
 ```php
+use HackPack\Scanner\ClassScanner;
+
 $includes = Set{...};
 $excludes = Set{...};
 $scanner = new ClassScanner($includes, $excludes);
