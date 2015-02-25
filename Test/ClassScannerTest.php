@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace kilahm\Test;
+namespace HackPack\Scanner\Test;
 
-use kilahm\Scanner\ClassScanner;
+use HackPack\Scanner\ClassScanner;
 use HackPack\HackUnit\Core\TestCase;
 
 class ClassScannerTest extends TestCase

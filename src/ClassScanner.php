@@ -1,6 +1,6 @@
 <?hh
 
-namespace kilahm\Scanner;
+namespace HackPack\Scanner;
 
 use Exception;
 use FilesystemIterator;

@@ -1,5 +1,5 @@
 {
-    "name": "kilahm/hack-class-scanner",
+    "name": "hackpack/hack-class-scanner",
     "description": "Recursively scan a directory for hack classes and/or interfaces",
     "license": "MIT",
     "type": "library",
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "kilahm\\Scanner\\" : "src/"
+            "HackPack\\Scanner\\" : "src/"
         }
     }
 }
