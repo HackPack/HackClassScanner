@@ -2,10 +2,11 @@
 
 namespace HackPack\Scanner\Test;
 
+use HackPack\HackUnit\Contract\Assert;
 use HackPack\Scanner\ClassScanner;
-use HackPack\HackUnit\Core\TestCase;
 
-class ClassScannerTest extends TestCase
+<<TestSuite>>
+class ClassScannerTest
 {
     private Map<string,string> $allClasses = Map{
         '\ClassA' => __DIR__ . '/Fixtures/ClassA.php',
@@ -29,50 +30,57 @@ class ClassScannerTest extends TestCase
         '\TextClass' => __DIR__ . '/Fixtures/text.txt',
     };
 
-    public function testScannerFindsAllClasses() : void
+    <<Test>>
+    public function testScannerFindsAllClasses(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
-        $this->expect($scan->mapClassToFile())->toEqual($this->allClasses);
+        $assert->mixed($scan->mapClassToFile())->looselyEquals($this->allClasses);
     }
 
-    public function testScannerDoesNotFindExcludedDirectories() : void
+    <<Test>>
+    public function testScannerDoesNotFindExcludedDirectories(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'}, Set{__DIR__ . '/Fixtures/SubSpace/'});
-        $this->expect($scan->mapClassToFile())->toEqual($this->topClasses);
+        $assert->mixed($scan->mapClassToFile())->looselyEquals($this->topClasses);
     }
 
-    public function testScannerFindsClassesAndInterfaces() : void
+    <<Test>>
+    public function testScannerFindsClassesAndInterfaces(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
-        $this->expect($scan->mapClassOrInterfaceToFile())->toEqual($this->allClassesAndInterfaces);
+        $assert->mixed($scan->mapClassOrInterfaceToFile())->looselyEquals($this->allClassesAndInterfaces);
     }
 
-    public function testClassFilter() : void
+    <<Test>>
+    public function testClassFilter(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
         $scan->addClassNameFilter($className ==> $className === '\ClassA');
-        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
+        $assert->mixed($scan->mapClassToFile())->looselyEquals(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
     }
 
-    public function testFileFilter() : void
+    <<Test>>
+    public function testFileFilter(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/'});
         $scan->addFileNameFilter($fileName ==> $fileName === __DIR__ . '/Fixtures/ClassA.php');
-        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
+        $assert->mixed($scan->mapClassToFile())->looselyEquals(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
     }
 
-    public function testScannerFindsOneFile() : void
+    <<Test>>
+    public function testScannerFindsOneFile(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures/text.txt'});
-        $this->expect($scan->mapClassToFile())->toEqual(Map{'\TextClass' => __DIR__ . '/Fixtures/text.txt'});
+        $assert->mixed($scan->mapClassToFile())->looselyEquals(Map{'\TextClass' => __DIR__ . '/Fixtures/text.txt'});
     }
 
-    public function testScannerExcludesOneFile() : void
+    <<Test>>
+    public function testScannerExcludesOneFile(Assert $assert) : void
     {
         $scan = new ClassScanner(Set{__DIR__ . '/Fixtures'}, Set{
             __DIR__ . '/Fixtures/SubSpace',
             __DIR__ . '/Fixtures/text.txt'
         });
-        $this->expect($scan->mapClassToFile())->toEqual(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
+        $assert->mixed($scan->mapClassToFile())->looselyEquals(Map{'\ClassA' => __DIR__ . '/Fixtures/ClassA.php'});
     }
 }
