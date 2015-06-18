@@ -8,11 +8,12 @@
         {
             "name": "Isaac Leinweber",
             "email": "brotchen@gmail.com",
-            "role": "Developer"
+            "role": "Author"
         }
     ],
+    "minimum-stability" : "dev",
     "require-dev": {
-        "hackpack/hackunit": "0.3.*"
+        "hackpack/hackunit": "dev-0.4-dev"
     },
     "autoload": {
         "psr-4": {
