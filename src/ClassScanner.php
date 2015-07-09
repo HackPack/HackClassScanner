@@ -135,6 +135,15 @@ final class ClassScanner
         $files = Vector{};
         /* HH_FIXME[2049] no HHI */
         foreach($this->includes as $root) {
+            if(is_file($root) && is_readable($root)) {
+                $files->add($root);
+                continue;
+            }
+
+            if(!is_dir($root) || ! is_readable($root)) {
+                continue;
+            }
+
             /* HH_FIXME[2049] no HHI */
             $dit = new \RecursiveDirectoryIterator($root);
             /* HH_FIXME[2049] no HHI */

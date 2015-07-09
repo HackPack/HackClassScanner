@@ -19,7 +19,7 @@ trait FileParserTest
     public function setUp() : void
     {
         $this->parser = new FileParser(
-            file_get_contents(__DIR__.'/data/'.$this->getFilename()),
+            file_get_contents(__DIR__.'/data/code/'.$this->getFilename()),
         );
     }
 }

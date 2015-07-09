@@ -16,7 +16,7 @@ use HackPack\Scanner\FileParser;
 <<TestSuite>>
 final class CurlyTest
 {
-    const string DATA_FILE = __DIR__.'/data/curly_then_function.php';
+    const string DATA_FILE = __DIR__.'/data/code/curly_then_function.php';
 
     <<Test>>
     public function testDefinitions(Assert $assert) : void
