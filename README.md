@@ -3,7 +3,7 @@ HackClassScanner
 [![Build Status](https://travis-ci.org/HackPack/HackClassScanner.svg)](https://travis-ci.org/HackPack/HackClassScanner)
 [![HHVM Status](http://hhvm.h4cc.de/badge/hackpack/hack-class-scanner.svg)](http://hhvm.h4cc.de/package/hackpack/hack-class-scanner)
 
-A class that recursively scans a directory for hack definitions of:
+A class that recursively scans a directory for [Hack](http://hacklang.org/) definitions of:
 
 * Classes
 * Interfaces
@@ -118,5 +118,5 @@ $xhpClasses = $scanner->mapClassToFile();
 Thanks
 ======
 
-The file parsing algorithm and the majority of the tests were authored by Fred Emmott in fredemmott/definitions-finder
+The file parsing algorithm and the majority of the tests were authored by [Fred Emmott](https://github.com/fredemmott) in [fredemmott/definitions-finder](https://github.com/fredemmott/definitions-finder)
 
