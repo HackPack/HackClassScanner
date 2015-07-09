@@ -1,38 +1,74 @@
-<?hh
+<?hh // strict
 
 namespace HackPack\Scanner;
-
-use Exception;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use SplFileObject;
 
 final class ClassScanner
 {
     private bool $findClasses = false;
     private bool $findInterfaces = false;
     private Vector<(function (string) : bool)> $fileFilters = Vector{};
-    private Vector<(function (string) : bool)> $classFilters = Vector{};
+    private Map<DefinitionType, Vector<(function (string) : bool)>> $definitionFilters;
+    private (function(string):DefinitionFinder) $definitionFinderFactory;
+    private Map<DefinitionType, Map<string, string>> $definitions;
 
-    public function __construct(public Set<string> $paths, public Set<string> $excludes = Set{})
+    public function __construct(
+        private \ConstSet<string> $includes,
+        \ConstSet<string> $excludes = Set{},
+        ?(function(string):DefinitionFinder) $definitionFinderFactory = null,
+    )
     {
-        $this->paths = $paths
+        // Initialize the filter container with empty lists
+        $this->definitionFilters = Map{};
+        $this->definitions = Map{};
+        foreach(DefinitionType::getValues() as $type) {
+             $this->definitionFilters->set($type, Vector{});
+             $this->definitions->set($type, Map{});
+        }
+
+        // Default to the file parser if no factory given
+        $this->definitionFinderFactory = $definitionFinderFactory === null ?
+            (string $data) ==> new FileParser($data) :
+            $definitionFinderFactory;
+
+        // Ensure paths given exist and canonicalize them
+        $this->includes = $includes
             ->filter($p ==> $p !== '' && (is_dir($p) || is_file($p)))
             ->map($p ==> realpath($p));
-        $this->excludes = $excludes
-            ->filter($p ==> $p !== '' && (is_dir($p) || is_file($p)))
-            ->map($p ==> realpath($p));
+
+        // Set up a filter using excludes as base paths
+        if( ! $excludes->isEmpty() ) {
+            $excludes = $excludes
+                ->filter($p ==> $p !== '' && (is_dir($p) || is_file($p)))
+                ->map($p ==> realpath($p));
+            $this->addFileNameFilter($fname ==> {
+                foreach($excludes as $path) {
+                    if(strpos($fname, $path) !== false) {
+                         return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        // Kick process the input
+        $this->process();
     }
 
-    public function addClassNameFilter((function (string) : bool) $filter) : this
+    public function addDefinitionNameFilter(
+        DefinitionType $type,
+        (function (string) : bool) $filter,
+    ) : this
     {
-        $this->classFilters->add($filter);
+        $this->definitionFilters->at($type)->add($filter);
         return $this;
     }
 
-    public function addClassNameFilters(Traversable<(function (string) : bool)> $filters) : this
+    public function addDefinitionNameFilters(
+        DefinitionType $type,
+        Traversable<(function (string) : bool)> $filters,
+    ) : this
     {
-        $this->classFilters->addAll($filters);
+        $this->definitionFilters->at($type)->addAll($filters);
         return $this;
     }
 
@@ -50,35 +86,39 @@ final class ClassScanner
 
     public function mapClassToFile() : Map<string,string>
     {
-        $this->findClasses = true;
-        $this->findInterfaces = false;
-        return $this->map();
+        return $this->mapDefinitionsToFile(Vector{DefinitionType::CLASS_DEF});
     }
 
     public function mapClassOrInterfaceToFile() : Map<string,string>
     {
-        $this->findClasses = true;
-        $this->findInterfaces = true;
-        return $this->map();
+        return $this->mapDefinitionsToFile(Vector{
+            DefinitionType::CLASS_DEF,
+            DefinitionType::INTERFACE_DEF,
+        });
     }
 
-    private function map() : Map<string,string>
+    public function mapDefinitionToFile(DefinitionType $type) : Map<string,string>
     {
-        $classMap = Map{};
-        foreach($this->paths as $basePath) {
-            $this->findFilesRecursive($basePath, $classMap);
-        }
-        return $classMap;
+        return $this->mapDefinitionsToFile(Vector{$type});
     }
 
-    private function filterClass(string $className) : bool
+    public function mapDefinitionsToFile(Traversable<DefinitionType> $types) : Map<string,string>
     {
-        foreach($this->classFilters as $filter) {
-            if( ! $filter($className)){
-                return false;
-            }
-        }
-        return true;
+         $out = Map{};
+         foreach($types as $type) {
+             $out->setAll(
+                 $this->definitions->at($type)
+                 ->filter($token ==> {
+                     foreach($this->definitionFilters->at($type) as $f) {
+                         if( ! $f($token) ) {
+                             return false;
+                         }
+                     }
+                     return true;
+                 })
+             );
+         }
+         return $out;
     }
 
     private function filterFile(string $fileName) : bool
@@ -91,108 +131,38 @@ final class ClassScanner
         return true;
     }
 
-    private function findFilesRecursive(string $path, Map<string,string> $map) : void
+    private function process() : void
     {
-        if(
-            is_file($path) &&
-            ! $this->excludes->contains($path) &&
-            $this->filterFile($path)
-        ) {
-            // Path given is already a file... no need to recurse into the directory
-            $className = $this->parseFile(new SplFileObject($path));
-            if($className !== '') {
-                $map[$className] = $path;
+        $files = Vector{};
+        /* HH_FIXME[2049] no HHI */
+        foreach($this->includes as $root) {
+            /* HH_FIXME[2049] no HHI */
+            $dit = new \RecursiveDirectoryIterator($root);
+            /* HH_FIXME[2049] no HHI */
+            $rit = new \RecursiveIteratorIterator($dit);
+            foreach ($rit as $path => $info) {
+                if ($info->isDir() || $info->isLink() || !$info->isReadable()) {
+                    continue;
+                }
+
+                if($this->filterFile($path))
+                    $files->add($path);
             }
-            return;
         }
 
-        foreach(new FileSystemIterator($path) as $finfo) {
-            if($finfo->isDir() && ! $this->excludes->contains($finfo->getRealPath())) {
-                $this->findFilesRecursive($finfo->getRealPath(), $map);
-            } elseif(
-                $finfo->isFile() &&
-                ! $this->excludes->contains($finfo->getRealPath()) &&
-                $this->filterFile($finfo->getRealPath())
-            ) {
-                $className = $this->parseFile($finfo->openFile());
-                if($className !== '') {
-                    $map[$className] = $finfo->getRealPath();
-                }
-            }
+        $factory = $this->definitionFinderFactory;
+        foreach($files as $path) {
+             $this->addDefinitions($path, $factory(file_get_contents($path)));
         }
     }
 
-    private function parseFile(SplFileObject $file) : string
+    private function addDefinitions(string $path, DefinitionFinder $finder) : void
     {
-        // incrementally break contents into tokens
-        $namespace = $class = $buffer = '';
-        $i = 0;
-        while ($class === '') {
-            if ($file->eof()) {
-                // No class to find
-                return '';
-            }
-            // Load 30 lines at a time
-            for($newline = 0; $newline < 30; $newline++) {
-                $buffer .= $file->fgets();
-            }
-
-            if (strpos($buffer, '{') === false) {
-                // Class definition requires braces
-                continue;
-            }
-
-            $tokens = token_get_all($buffer);
-
-            for (; $i < count($tokens); $i++) {
-
-                //search for a namespace
-                if ($tokens[$i][0] === \T_NAMESPACE) {
-                    for ($j = $i + 1; $j < count($tokens); $j++) {
-                        // Namespace ends on { or ;
-                        if (is_array($tokens[$j])) {
-                            $namespace .= trim((string) $tokens[$j][1]);
-                        } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
-                            break;
-                        } else {
-                            $namespace .= (string) $tokens[$j];
-                        }
-                    }
-                }
-
-                //search for the class name
-                if (
-                    ($this->findClasses && $tokens[$i][0] === \T_CLASS) ||
-                    ($this->findInterfaces && $tokens[$i][0] === \T_INTERFACE)
-                ) {
-                    for ($j = $i + 1; $j < count($tokens); $j++) {
-                        if($tokens[$j] === '{') {
-                            // We found one!
-                            $class = $tokens[$i + 2][1];
-                            break;
-                        } elseif($tokens[$j] === '}' || $tokens[$j] === ';') {
-                            // We found ::class inside of a context
-                            $class = '';
-                            break;
-                        }
-                    }
-                }
-
-                if($class !== '') {
-                    // Stop looking for the class name after it is found
-                    break;
-                }
-            }
+        foreach($this->definitions as $type => $list) {
+            $list->addAll(
+                $finder->get($type)
+                ->map($def ==> Pair{$def, $path})
+            );
         }
-
-        if($namespace !== '' && substr($namespace, 0, 1) !== '\\') {
-            $namespace = '\\' . $namespace;
-        }
-
-        $fullname = implode('\\', [$namespace, $class]);
-        if($this->filterClass($fullname)){
-            return $fullname;
-        }
-        return '';
     }
 }
