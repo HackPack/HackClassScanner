@@ -27,7 +27,7 @@ final class ClassScanner
 
         // Default to the file parser if no factory given
         $this->definitionFinderFactory = $definitionFinderFactory === null ?
-            (string $data) ==> new FileParser($data) :
+            (string $data) ==> new FileParser(file_get_contents($data)) :
             $definitionFinderFactory;
 
         // Ensure paths given exist and canonicalize them
@@ -152,7 +152,7 @@ final class ClassScanner
 
         $factory = $this->definitionFinderFactory;
         foreach($files as $path) {
-             $this->addDefinitions($path, $factory(file_get_contents($path)));
+             $this->addDefinitions($path, $factory($path));
         }
     }
 
