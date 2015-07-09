@@ -49,9 +49,6 @@ final class ClassScanner
                 return true;
             });
         }
-
-        // Kick process the input
-        $this->process();
     }
 
     public function addDefinitionNameFilter(
@@ -104,21 +101,22 @@ final class ClassScanner
 
     public function mapDefinitionsToFile(Traversable<DefinitionType> $types) : Map<string,string>
     {
-         $out = Map{};
-         foreach($types as $type) {
-             $out->setAll(
-                 $this->definitions->at($type)
-                 ->filter($token ==> {
-                     foreach($this->definitionFilters->at($type) as $f) {
-                         if( ! $f($token) ) {
-                             return false;
-                         }
-                     }
-                     return true;
-                 })
-             );
-         }
-         return $out;
+        $this->process();
+        $out = Map{};
+        foreach($types as $type) {
+            $out->setAll(
+                $this->definitions->at($type)
+                ->filter($token ==> {
+                    foreach($this->definitionFilters->at($type) as $f) {
+                        if( ! $f($token) ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                );
+        }
+        return $out;
     }
 
     private function filterFile(string $fileName) : bool
@@ -131,6 +129,7 @@ final class ClassScanner
         return true;
     }
 
+    <<__Memoize>>
     private function process() : void
     {
         $files = Vector{};
