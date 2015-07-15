@@ -14,27 +14,22 @@ use HackPack\Scanner\FileParser;
 //
 // This test makes sure that this doesn't get confused.
 <<TestSuite>>
-final class CurlyTest
+final class CurlyTest extends \PHPUnit_Framework_TestCase
 {
     const string DATA_FILE = __DIR__.'/data/code/curly_then_function.php';
 
     <<Test>>
-    public function testDefinitions(Assert $assert) : void
+    public function testDefinitions() : void
     {
         $p = new FileParser(file_get_contents(self::DATA_FILE));
 
-        $assert
-            ->mixed($p->get(DefinitionType::CLASS_DEF))
-            ->looselyEquals(Vector{'Foo'});
-
-        $assert
-            ->mixed($p->get(DefinitionType::FUNCTION_DEF))
-            ->looselyEquals(Vector{'my_func'});
+        $this->assertEquals(Vector{'Foo'}, $p->get(DefinitionType::CLASS_DEF));
+        $this->assertEquals(Vector{'my_func'}, $p->get(DefinitionType::FUNCTION_DEF));
     }
 
     // Actually testing the tokenizer hasn't changed
     <<Test>>
-    public function testContainsTCurlyOpen(Assert $assert) : void
+    public function testContainsTCurlyOpen() : void
     {
         $matched = false;
         $tokens = token_get_all(file_get_contents(self::DATA_FILE));
@@ -44,19 +39,19 @@ final class CurlyTest
                 break;
             }
         }
-        $assert->bool($matched)->is(true);
+        $this->assertTrue($matched);
     }
 
     // Actually testing the tokenizer hasn't changed
     <<Test>>
-    public function testDoesNotContainTCurlyClose(Assert $assert) : void
+    public function testDoesNotContainTCurlyClose() : void
     {
         $tokens = token_get_all(file_get_contents(self::DATA_FILE));
         foreach ($tokens as $token) {
             if (!is_array($token)) {
                 continue;
             }
-            $assert->bool($token[1] !== '}')->is(true);
+            $this->assertTrue($token[1] !== '}');
         }
     }
 }

@@ -11,9 +11,10 @@
             "role": "Author"
         }
     ],
-    "minimum-stability" : "dev",
+    "minimum-stability" : "stable",
     "require-dev": {
-        "hackpack/hackunit": "dev-0.4-dev"
+        "phpunit/phpunit": "^4.7",
+        "91carriage/phpunit-hhi": "^4.5"
     },
     "autoload": {
         "psr-4": {

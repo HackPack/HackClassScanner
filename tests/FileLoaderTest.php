@@ -2,7 +2,6 @@
 
 namespace HackPack\Scanner\Tests;
 
-use HackPack\HackUnit\Contract\Assert;
 use HackPack\Scanner\ClassScanner;
 use HackPack\Scanner\DefinitionFinder;
 use HackPack\Scanner\DefinitionType;
@@ -15,7 +14,7 @@ enum IncludeDir : string as string
 }
 
 <<TestSuite>>
-class FileLoaderTest
+class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     private Set<string> $filesLoaded = Set{};
     private MockDefinitionFinder $finder;
@@ -46,8 +45,8 @@ class FileLoaderTest
         return $out;
     }
 
-    <<Setup>>
-    public function clearFileList() : void
+    <<__Override, Setup>>
+    public function setUp() : void
     {
         $this->filesLoaded->clear();
     }
@@ -55,7 +54,7 @@ class FileLoaderTest
     ///// Tests for inclusion only /////
 
     <<Test>>
-    public function loaderRecursesIntoSubDirectories(Assert $assert) : void
+    public function testLoaderRecursesIntoSubDirectories() : void
     {
         $loader = new ClassScanner(
             Set{IncludeDir::base},
@@ -63,14 +62,20 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
+        $this->assertTrue($classes->isEmpty());
 
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals($this->fileList(Set{IncludeDir::base, IncludeDir::ignore, IncludeDir::sibling}));
+        $this->assertEquals(
+            $this->filesLoaded,
+            $this->fileList(Set{
+                IncludeDir::base,
+                IncludeDir::ignore,
+                IncludeDir::sibling,
+            }),
+        );
     }
 
     <<Test>>
-    public function loaderFindsFilesInSiblingDirectories(Assert $assert) : void
+    public function testLoaderFindsFilesInSiblingDirectories() : void
     {
         $loader = new ClassScanner(
             Set{IncludeDir::ignore, IncludeDir::sibling},
@@ -78,17 +83,19 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
+        $this->assertTrue($classes->isEmpty());
 
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals($this->fileList(Set{
+        $this->assertEquals(
+            $this->filesLoaded,
+            $this->fileList(Set{
                 IncludeDir::ignore,
                 IncludeDir::sibling,
-            }));
+            }),
+        );
     }
 
     <<Test>>
-    public function loaderFindsAllFilesInOneDirectory(Assert $assert) : void
+    public function testLoaderFindsAllFilesInOneDirectory() : void
     {
         $loader = new ClassScanner(
             Set{IncludeDir::sibling},
@@ -96,16 +103,18 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
+        $this->assertTrue($classes->isEmpty());
 
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals($this->fileList(Set{
+        $this->assertEquals(
+            $this->fileList(Set{
                 IncludeDir::sibling
-            }));
+            }),
+            $this->filesLoaded,
+        );
     }
 
     <<Test>>
-    public function loaderFindsOneFile(Assert $assert) : void
+    public function testLoaderFindsOneFile() : void
     {
         $filename = IncludeDir::base . 'file1.php';
         $loader = new ClassScanner(
@@ -114,16 +123,17 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
-
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals(Set{$filename});
+        $this->assertTrue($classes->isEmpty());
+        $this->assertEquals(
+            Set{$filename},
+            $this->filesLoaded,
+        );
     }
 
     ///// Tests for exclusion /////
 
     <<Test>>
-    public function loaderIgnoresDirectory(Assert $assert) : void
+    public function testLoaderIgnoresDirectory() : void
     {
         $loader = new ClassScanner(
             Set{IncludeDir::base},
@@ -131,17 +141,18 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
-
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals($this->fileList(Set{
+        $this->assertTrue($classes->isEmpty());
+        $this->assertEquals(
+            $this->fileList(Set{
                 IncludeDir::base,
                 IncludeDir::sibling,
-            }));
+            }),
+            $this->filesLoaded,
+        );
     }
 
     <<Test>>
-    public function loaderIgnoresSingleFile(Assert $assert) : void
+    public function testLoaderIgnoresSingleFile() : void
     {
         $loader = new ClassScanner(
             Set{IncludeDir::ignore},
@@ -149,16 +160,18 @@ class FileLoaderTest
             $this->factory,
         );
         $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
-        $assert->bool($classes->isEmpty())->is(true);
+        $this->assertTrue($classes->isEmpty());
 
         $all = $this->fileList(Set{IncludeDir::ignore});
         $expected = $all->filter($f ==> $f !== IncludeDir::ignore . 'file1.php');
 
         // Ensure the file being filtered is known
-        $assert->int($expected->count() + 1)->eq($all->count());
+        $this->assertEquals(
+            $all->count(),
+            $expected->count() + 1,
+        );
 
         // Test the loader
-        $assert->mixed($this->filesLoaded)
-            ->looselyEquals($expected);
+        $this->assertEquals($expected, $this->filesLoaded);
     }
 }

@@ -6,7 +6,7 @@ use HackPack\HackUnit\Contract\Assert;
 use HackPack\Scanner\DefinitionType;
 
 <<TestSuite>>
-final class MultiNamespacePHPTest implements HasFileName
+final class MultiNamespacePHPTest extends \PHPUnit_Framework_TestCase implements HasFileName
 {
     use FileParserTest;
 
@@ -16,13 +16,13 @@ final class MultiNamespacePHPTest implements HasFileName
     }
 
     <<Test>>
-    public function testClasses(Assert $assert): void {
+    public function testClasses(): void {
         $expected = Vector {
             'Foo\\Bar',
             'Herp\\Derp',
             'EmptyNamespace',
         };
         $actual = $this->parser->get(DefinitionType::CLASS_DEF);
-        $assert->mixed($actual)->looselyEquals($expected);
+        $this->assertEquals($expected, $actual);
     }
 }
