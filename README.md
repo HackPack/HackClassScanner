@@ -37,14 +37,14 @@ $scanner = new ClassScanner(
   Set{‘other/directory/to/ignore’, ‘other/directory/file_to_ignore.txt’}
 );
 
-$classes = $scanner->get(DefinitionType::CLASS_DEF);
-$interfaces = $scanner->get(DefinitionType::INTERFACE_DEF);
-$traits = $scanner->get(DefinitionType::TRAIT_DEF);
-$enums = $scanner->get(DefinitionType::ENUM_DEF);
-$types = $scanner->get(DefinitionType::TYPE_DEF);
-$newtypes = $scanner->get(DefinitionType::NEWTYPE_DEF);
-$functions = $scanner->get(DefinitionType::FUNCTION_DEF);
-$constants = $scanner->get(DefinitionType::CONST_DEF);
+$classes = $scanner->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+$interfaces = $scanner->mapDefinitionToFile(DefinitionType::INTERFACE_DEF);
+$traits = $scanner->mapDefinitionToFile(DefinitionType::TRAIT_DEF);
+$enums = $scanner->mapDefinitionToFile(DefinitionType::ENUM_DEF);
+$types = $scanner->mapDefinitionToFile(DefinitionType::TYPE_DEF);
+$newtypes = $scanner->mapDefinitionToFile(DefinitionType::NEWTYPE_DEF);
+$functions = $scanner->mapDefinitionToFile(DefinitionType::FUNCTION_DEF);
+$constants = $scanner->mapDefinitionToFile(DefinitionType::CONST_DEF);
 ```
 
 The `get` method takes one parameter specifying the type of the definition desired.  `get` will return a `Map<string,string>` where the keys are the names of the definitions
@@ -58,7 +58,7 @@ You can filter the results based on the name of the definition and/or the name o
 
 ### File Name Filters
 
-To register a definition name filter, call `ClassScanner->addFileNameFilter()` with the filter callback (see example below).
+To register a file name filter, call `ClassScanner->addFileNameFilter()` with the filter callback (see example below).
 
 The input for a file name filter is the full path to the file (via `realpath`).  If all registered filter functions return `true` for a particular file name, the file will be scanned.
 If any of the filters return `false`, the file will not be read (via `file_get_contents`).
