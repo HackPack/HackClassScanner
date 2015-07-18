@@ -7,9 +7,9 @@ final class ClassScanner
     private bool $findClasses = false;
     private bool $findInterfaces = false;
     private Vector<(function (string) : bool)> $fileFilters = Vector{};
-    private Map<DefinitionType, Vector<(function (string) : bool)>> $definitionFilters;
+    private Map<NameType, Vector<(function (string) : bool)>> $definitionFilters;
     private (function(string):DefinitionFinder) $definitionFinderFactory;
-    private Map<DefinitionType, Map<string, string>> $definitions;
+    private Map<NameType, Map<string, string>> $definitions;
 
     public function __construct(
         private \ConstSet<string> $includes,
@@ -20,7 +20,7 @@ final class ClassScanner
         // Initialize the filter container with empty lists
         $this->definitionFilters = Map{};
         $this->definitions = Map{};
-        foreach(DefinitionType::getValues() as $type) {
+        foreach(NameType::getValues() as $type) {
              $this->definitionFilters->set($type, Vector{});
              $this->definitions->set($type, Map{});
         }
@@ -51,8 +51,14 @@ final class ClassScanner
         }
     }
 
-    public function addDefinitionNameFilter(
-        DefinitionType $type,
+    /**
+     * Register a name filter callback
+     *
+     * The callback will be given the name of the class, function, etc including the full namespace.
+     * If any filter returns false, the name will not appear in the list of the provided name type.
+     */
+    public function addNameFilter(
+        NameType $type,
         (function (string) : bool) $filter,
     ) : this
     {
@@ -60,8 +66,8 @@ final class ClassScanner
         return $this;
     }
 
-    public function addDefinitionNameFilters(
-        DefinitionType $type,
+    public function addNameFilters(
+        NameType $type,
         Traversable<(function (string) : bool)> $filters,
     ) : this
     {
@@ -69,6 +75,12 @@ final class ClassScanner
         return $this;
     }
 
+    /**
+     * Register a file name filter callback
+     *
+     * The callback will be given the name of the file, including the full path.
+     * If any filter returns false, the file will not be loaded/scanned
+     */
     public function addFileNameFilter((function (string) : bool) $filter) : this
     {
         $this->fileFilters->add($filter);
@@ -81,42 +93,74 @@ final class ClassScanner
         return $this;
     }
 
-    public function mapClassToFile() : Map<string,string>
+    /**
+     * Get a mapping of definition name to file where the name is defined.
+     */
+    public function getNameToFileMap(NameType $type) : Map<string, string>
     {
-        return $this->mapDefinitionsToFile(Vector{DefinitionType::CLASS_DEF});
+        return $this->getAllNameToFileMaps()->at($type);
     }
 
-    public function mapClassOrInterfaceToFile() : Map<string,string>
+    /**
+     * Get all mappings of definition names to files where the names are defined.
+     */
+    public function getAllNameToFileMaps() : Map<NameType, Map<string, string>>
     {
-        return $this->mapDefinitionsToFile(Vector{
-            DefinitionType::CLASS_DEF,
-            DefinitionType::INTERFACE_DEF,
-        });
-    }
-
-    public function mapDefinitionToFile(DefinitionType $type) : Map<string,string>
-    {
-        return $this->mapDefinitionsToFile(Vector{$type});
-    }
-
-    public function mapDefinitionsToFile(Traversable<DefinitionType> $types) : Map<string,string>
-    {
+        // process is memoized so files will only be scanned once
         $this->process();
-        $out = Map{};
-        foreach($types as $type) {
-            $out->setAll(
-                $this->definitions->at($type)
-                ->filter($token ==> {
-                    foreach($this->definitionFilters->at($type) as $f) {
-                        if( ! $f($token) ) {
-                            return false;
-                        }
+        return $this->definitions->mapWithKey(
+            // Loop through all names
+            ($type, $list) ==> $list->filter($token ==> {
+                // Apply all filters for each type
+                foreach($this->definitionFilters->at($type) as $f) {
+                    if( ! $f($token) ) {
+                        return false;
                     }
-                    return true;
-                })
-                );
+                }
+                return true;
+            })
+        );
+    }
+
+    ///// Implementation /////
+
+    <<__Memoize>>
+    private function process() : void
+    {
+        $files = Vector{};
+        foreach($this->includes as $root) {
+
+            // If user referenced a file, just add it to the list to be scanned
+            if(is_file($root) && is_readable($root)) {
+                $files->add($root);
+                continue;
+            }
+
+            // If user referenced a non file and non directory, just skip it
+            if(!is_dir($root) || ! is_readable($root)) {
+                continue;
+            }
+
+            /* HH_FIXME[2049] no HHI */
+            $dit = new \RecursiveDirectoryIterator($root);
+            /* HH_FIXME[2049] no HHI */
+            $rit = new \RecursiveIteratorIterator($dit);
+            foreach ($rit as $path => $info) {
+                // Only add actual files
+                if ($info->isDir() || $info->isLink() || !$info->isReadable()) {
+                    continue;
+                }
+
+                if($this->filterFile($path)) {
+                    $files->add($path);
+                }
+            }
         }
-        return $out;
+
+        $factory = $this->definitionFinderFactory;
+        foreach($files as $path) {
+             $this->addDefinitions($path, $factory($path));
+        }
     }
 
     private function filterFile(string $fileName) : bool
@@ -127,41 +171,6 @@ final class ClassScanner
             }
         }
         return true;
-    }
-
-    <<__Memoize>>
-    private function process() : void
-    {
-        $files = Vector{};
-        /* HH_FIXME[2049] no HHI */
-        foreach($this->includes as $root) {
-            if(is_file($root) && is_readable($root)) {
-                $files->add($root);
-                continue;
-            }
-
-            if(!is_dir($root) || ! is_readable($root)) {
-                continue;
-            }
-
-            /* HH_FIXME[2049] no HHI */
-            $dit = new \RecursiveDirectoryIterator($root);
-            /* HH_FIXME[2049] no HHI */
-            $rit = new \RecursiveIteratorIterator($dit);
-            foreach ($rit as $path => $info) {
-                if ($info->isDir() || $info->isLink() || !$info->isReadable()) {
-                    continue;
-                }
-
-                if($this->filterFile($path))
-                    $files->add($path);
-            }
-        }
-
-        $factory = $this->definitionFinderFactory;
-        foreach($files as $path) {
-             $this->addDefinitions($path, $factory($path));
-        }
     }
 
     private function addDefinitions(string $path, DefinitionFinder $finder) : void

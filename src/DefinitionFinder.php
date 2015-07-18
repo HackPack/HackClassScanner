@@ -4,5 +4,5 @@ namespace HackPack\Scanner;
 
 interface DefinitionFinder
 {
-    public function get(DefinitionType $type) : \ConstVector<string>;
+    public function get(NameType $type) : \ConstVector<string>;
 }

@@ -3,13 +3,13 @@
 namespace HackPack\Scanner\Tests;
 
 use HackPack\Scanner\DefinitionFinder;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 class MockDefinitionFinder implements DefinitionFinder
 {
     private Vector<string> $vect = Vector{};
 
-    public function get(DefinitionType $type) : \ConstVector<string>
+    public function get(NameType $type) : \ConstVector<string>
     {
         return $this->vect;
     }

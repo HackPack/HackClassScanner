@@ -27,24 +27,24 @@ class FileParser implements DefinitionFinder
       $this->file = $name;
   }
 
-  public function get(DefinitionType $type) : \ConstVector<string>
+  public function get(NameType $type) : \ConstVector<string>
   {
       switch($type) {
-      case DefinitionType::CLASS_DEF:
+      case NameType::CLASS_DEF:
           return $this->classes;
-      case DefinitionType::INTERFACE_DEF:
+      case NameType::INTERFACE_DEF:
           return $this->interfaces;
-      case DefinitionType::TRAIT_DEF:
+      case NameType::TRAIT_DEF:
           return $this->traits;
-      case DefinitionType::ENUM_DEF :
+      case NameType::ENUM_DEF :
           return $this->enums;
-      case DefinitionType::TYPE_DEF :
+      case NameType::TYPE_DEF :
           return $this->types;
-      case DefinitionType::NEWTYPE_DEF :
+      case NameType::NEWTYPE_DEF :
           return $this->newtypes;
-      case DefinitionType::FUNCTION_DEF :
+      case NameType::FUNCTION_DEF :
           return $this->functions;
-      case DefinitionType::CONST_DEF :
+      case NameType::CONST_DEF :
           return $this->constants;
       }
   }
@@ -85,8 +85,8 @@ class FileParser implements DefinitionFinder
             $this->consumeNamespaceDefinition();
         }
 
-        if (DefinitionType::isValid($ttype)) {
-          $this->consumeDefinition(DefinitionType::assert($ttype));
+        if (NameType::isValid($ttype)) {
+          $this->consumeDefinition(NameType::assert($ttype));
           continue;
         }
         // I hate you, PHP.
@@ -106,24 +106,24 @@ class FileParser implements DefinitionFinder
     } while ($this->tokens && $token_type !== T_OPEN_TAG);
   }
 
-  private function consumeDefinition(DefinitionType $def_type): void {
+  private function consumeDefinition(NameType $def_type): void {
     $this->consumeWhitespace();
 
     switch ($def_type) {
-      case DefinitionType::CLASS_DEF:
-      case DefinitionType::INTERFACE_DEF:
-      case DefinitionType::TRAIT_DEF:
+      case NameType::CLASS_DEF:
+      case NameType::INTERFACE_DEF:
+      case NameType::TRAIT_DEF:
         $this->consumeClassDefinition($def_type);
         return;
-      case DefinitionType::FUNCTION_DEF:
+      case NameType::FUNCTION_DEF:
         $this->consumeFunctionDefinition();
         return;
-      case DefinitionType::CONST_DEF:
+      case NameType::CONST_DEF:
         $this->consumeConstantDefinition();
         return;
-      case DefinitionType::TYPE_DEF:
-      case DefinitionType::NEWTYPE_DEF:
-      case DefinitionType::ENUM_DEF:
+      case NameType::TYPE_DEF:
+      case NameType::NEWTYPE_DEF:
+      case NameType::ENUM_DEF:
         $this->consumeSimpleDefinition($def_type);
         return;
     }
@@ -263,7 +263,7 @@ class FileParser implements DefinitionFinder
     return tuple($token, null);
   }
 
-  private function consumeClassDefinition(DefinitionType $def_type): void {
+  private function consumeClassDefinition(NameType $def_type): void {
     list($v, $t) = $this->shiftToken();
     if ($t === T_STRING) {
       $name = $v;
@@ -275,7 +275,7 @@ class FileParser implements DefinitionFinder
         $this->file,
       );
       invariant(
-        $def_type === DefinitionType::CLASS_DEF,
+        $def_type === NameType::CLASS_DEF,
         'Seeing an XHP class name for a %s in %s',
         token_name($def_type),
         $this->file,
@@ -285,13 +285,13 @@ class FileParser implements DefinitionFinder
     }
     $fqn = $this->namespace.$name;
     switch ($def_type) {
-      case DefinitionType::CLASS_DEF:
+      case NameType::CLASS_DEF:
         $this->classes[] = $fqn;
         break;
-      case DefinitionType::INTERFACE_DEF:
+      case NameType::INTERFACE_DEF:
         $this->interfaces[] = $fqn;
         break;
-      case DefinitionType::TRAIT_DEF:
+      case NameType::TRAIT_DEF:
         $this->traits[] = $fqn;
         break;
       default:
@@ -303,7 +303,7 @@ class FileParser implements DefinitionFinder
     $this->skipToAndConsumeBlock();
   }
 
-  private function consumeSimpleDefinition(DefinitionType $def_type): void {
+  private function consumeSimpleDefinition(NameType $def_type): void {
     list($next, $next_type) = $this->shiftToken();
     invariant(
       $next_type === T_STRING,
@@ -314,13 +314,13 @@ class FileParser implements DefinitionFinder
     );
     $fqn = $this->namespace.$next;
     switch ($def_type) {
-      case DefinitionType::TYPE_DEF:
+      case NameType::TYPE_DEF:
         $this->types[] = $fqn;
         break;
-      case DefinitionType::NEWTYPE_DEF:
+      case NameType::NEWTYPE_DEF:
         $this->newtypes[] = $fqn;
         break;
-      case DefinitionType::ENUM_DEF:
+      case NameType::ENUM_DEF:
         $this->enums[] = $fqn;
         $this->skipToAndConsumeBlock();
         return;

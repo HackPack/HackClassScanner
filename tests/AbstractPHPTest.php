@@ -2,7 +2,7 @@
 
 namespace HackPack\Scanner\Tests;
 
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 use HackPack\Scanner\FileParser;
 
 abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements HasFileName
@@ -18,7 +18,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
             $this->getPrefix().'SimpleAbstractClass',
             $this->getPrefix().'SimpleFinalClass',
         };
-        $actual = $this->parser->get(DefinitionType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::CLASS_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -27,7 +27,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
         $expected = Vector{
             $this->getPrefix().'SimpleInterface',
         };
-        $actual = $this->parser->get(DefinitionType::INTERFACE_DEF);
+        $actual = $this->parser->get(NameType::INTERFACE_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -36,7 +36,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
         $expected = Vector{
             $this->getPrefix().'SimpleTrait'
         };
-        $actual = $this->parser->get(DefinitionType::TRAIT_DEF);
+        $actual = $this->parser->get(NameType::TRAIT_DEF);
         $this->assertEquals($expected, $actual);
     }
 }

@@ -3,7 +3,7 @@
 namespace HackPack\Scanner\Tests;
 
 use HackPack\HackUnit\Contract\Assert;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 use HackPack\Scanner\FileParser;
 
 /**
@@ -18,7 +18,7 @@ final class FunctionNotDefinitionTest extends \PHPUnit_Framework_TestCase
         $p = new FileParser('<?hh function foo();');
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
     }
 
@@ -27,22 +27,22 @@ final class FunctionNotDefinitionTest extends \PHPUnit_Framework_TestCase
         $p = new FileParser('<?hh newtype Foo = function(int): void;');
         $this->assertEquals(
             Vector{},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
         $this->assertEquals(
             Vector{'Foo'},
-            $p->get(DefinitionType::NEWTYPE_DEF),
+            $p->get(NameType::NEWTYPE_DEF),
         );
 
         // Add extra whitespace
         $p = new FileParser('<?hh newtype Foo = function (int): void;');
         $this->assertEquals(
             Vector{},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
         $this->assertEquals(
             Vector{'Foo'},
-            $p->get(DefinitionType::NEWTYPE_DEF),
+            $p->get(NameType::NEWTYPE_DEF),
         );
     }
 
@@ -55,7 +55,7 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
     }
 
@@ -64,7 +64,7 @@ EOF
         $p = new FileParser('<?hh function foo((function():void) $callback) { }');
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
     }
 
@@ -80,7 +80,7 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
     }
 
@@ -94,13 +94,13 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(DefinitionType::FUNCTION_DEF),
+            $p->get(NameType::FUNCTION_DEF),
         );
     }
 
     <<Test>>
     public function testAsRVal() : void {
         $p = new FileParser('<?php $f = function(){};');
-        $this->assertTrue($p->get(DefinitionType::FUNCTION_DEF)->isEmpty());
+        $this->assertTrue($p->get(NameType::FUNCTION_DEF)->isEmpty());
     }
 }

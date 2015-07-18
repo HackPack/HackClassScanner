@@ -3,7 +3,7 @@
 namespace HackPack\Scanner\Tests;
 
 use HackPack\HackUnit\Contract\Assert;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 <<TestSuite>>
 final class MultiNamespacePHPTest extends \PHPUnit_Framework_TestCase implements HasFileName
@@ -22,7 +22,7 @@ final class MultiNamespacePHPTest extends \PHPUnit_Framework_TestCase implements
             'Herp\\Derp',
             'EmptyNamespace',
         };
-        $actual = $this->parser->get(DefinitionType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::CLASS_DEF);
         $this->assertEquals($expected, $actual);
     }
 }

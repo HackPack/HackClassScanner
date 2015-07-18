@@ -4,7 +4,7 @@ namespace HackPack\Scanner\Tests;
 
 use HackPack\Scanner\ClassScanner;
 use HackPack\Scanner\DefinitionFinder;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 enum IncludeDir : string as string
 {
@@ -61,7 +61,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
 
         $this->assertEquals(
@@ -82,7 +82,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
 
         $this->assertEquals(
@@ -102,7 +102,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
 
         $this->assertEquals(
@@ -122,7 +122,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
         $this->assertEquals(
             Set{$filename},
@@ -140,7 +140,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{IncludeDir::ignore},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
         $this->assertEquals(
             $this->fileList(Set{
@@ -159,7 +159,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             Set{IncludeDir::ignore . 'file1.php'},
             $this->factory,
         );
-        $classes = $loader->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+        $classes = $loader->getNameToFileMap(NameType::CLASS_DEF);
         $this->assertTrue($classes->isEmpty());
 
         $all = $this->fileList(Set{IncludeDir::ignore});

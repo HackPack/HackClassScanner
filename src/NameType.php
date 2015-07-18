@@ -2,7 +2,7 @@
 
 namespace HackPack\Scanner;
 
-enum DefinitionType: int {
+enum NameType: int {
   CLASS_DEF = T_CLASS;
   INTERFACE_DEF = T_INTERFACE;
   TRAIT_DEF = T_TRAIT;

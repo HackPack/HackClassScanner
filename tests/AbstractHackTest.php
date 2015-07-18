@@ -2,7 +2,7 @@
 
 namespace HackPack\Scanner\Tests;
 
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements HasFileName
 {
@@ -21,7 +21,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'xhp_foo',
             $this->getPrefix().'xhp_foo__bar',
         };
-        $actual = $this->parser->get(DefinitionType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::CLASS_DEF);
     }
 
     <<Test>>
@@ -30,7 +30,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MyType',
             $this->getPrefix().'MyGenericType',
         };
-        $actual = $this->parser->get(DefinitionType::TYPE_DEF);
+        $actual = $this->parser->get(NameType::TYPE_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -40,7 +40,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MyNewtype',
             $this->getPrefix().'MyGenericNewtype',
         };
-        $actual = $this->parser->get(DefinitionType::NEWTYPE_DEF);
+        $actual = $this->parser->get(NameType::NEWTYPE_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -49,7 +49,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
         $expected = Vector {
             $this->getPrefix().'MyEnum',
         };
-        $actual = $this->parser->get(DefinitionType::ENUM_DEF);
+        $actual = $this->parser->get(NameType::ENUM_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -63,7 +63,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'generic_function',
             $this->getPrefix().'byref_return_function',
         };
-        $actual = $this->parser->get(DefinitionType::FUNCTION_DEF);
+        $actual = $this->parser->get(NameType::FUNCTION_DEF);
         $this->assertEquals($expected, $actual);
     }
 
@@ -77,7 +77,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MY_OTHER_OLD_STYLE_CONST',
             $this->getPrefix().'NOW_IM_JUST_FUCKING_WITH_YOU',
         };
-        $actual = $this->parser->get(DefinitionType::CONST_DEF);
+        $actual = $this->parser->get(NameType::CONST_DEF);
         $this->assertEquals($expected, $actual);
     }
 }

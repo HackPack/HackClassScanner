@@ -30,25 +30,25 @@ To use the class, simply instantiate it with a set of files/base directories to 
 
 ```php
 use HackPack\Scanner\ClassScanner;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 $scanner = new ClassScanner(
   Set{‘directory/to/scan’, ‘other/directory’, ‘file/to/scan.txt’},
   Set{‘other/directory/to/ignore’, ‘other/directory/file_to_ignore.txt’}
 );
 
-$classes = $scanner->get(DefinitionType::CLASS_DEF);
-$interfaces = $scanner->get(DefinitionType::INTERFACE_DEF);
-$traits = $scanner->get(DefinitionType::TRAIT_DEF);
-$enums = $scanner->get(DefinitionType::ENUM_DEF);
-$types = $scanner->get(DefinitionType::TYPE_DEF);
-$newtypes = $scanner->get(DefinitionType::NEWTYPE_DEF);
-$functions = $scanner->get(DefinitionType::FUNCTION_DEF);
-$constants = $scanner->get(DefinitionType::CONST_DEF);
+$classes = $scanner->getNameToFileMap(NameType::CLASS_DEF);
+$interfaces = $scanner->getNameToFileMap(NameType::INTERFACE_DEF);
+$traits = $scanner->getNameToFileMap(NameType::TRAIT_DEF);
+$enums = $scanner->getNameToFileMap(NameType::ENUM_DEF);
+$types = $scanner->getNameToFileMap(NameType::TYPE_DEF);
+$newtypes = $scanner->getNameToFileMap(NameType::NEWTYPE_DEF);
+$functions = $scanner->getNameToFileMap(NameType::FUNCTION_DEF);
+$constants = $scanner->getNameToFileMap(NameType::CONST_DEF);
 ```
 
-The `get` method takes one parameter specifying the type of the definition desired.  `get` will return a `Map<string,string>` where the keys are the names of the definitions
-and the values are the full path to the file in which the definition resides.
+The `getNameToFileMap` method takes one parameter specifying the type of the definition desired.  `getNameToFileMap` will return a `Map<string,string>` where the keys are the names of the classes, interfaces, traits, etc...
+including the full name space and the values are the full path to the file in which the definition resides.
 
 Please note that ALL files will be scanned by default (not just .php and/or .hh files).  If you wish to only scan files with a particular extension, see the file name filter section below.
 
@@ -61,13 +61,13 @@ You can filter the results based on the name of the definition and/or the name o
 To register a definition name filter, call `ClassScanner->addFileNameFilter()` with the filter callback (see example below).
 
 The input for a file name filter is the full path to the file (via `realpath`).  If all registered filter functions return `true` for a particular file name, the file will be scanned.
-If any of the filters return `false`, the file will not be read (via `file_get_contents`).
+If at least one registered file filter returns `false`, the file will not be read (via `file_get_contents`).
 
 ### Definition Name Filters
 
-To register a definition name filter, call `ClassScanner->addDefinitionNameFilter()` with the definition type and the filter callback (see example below).
+To register a name filter, call `ClassScanner->addNameFilter()` with the name type and the filter callback (see example below).
 
-The input for a definition name filter is the name of the definition including the namespace. If any registered filter function returns `false` for a particular name, that name
+The input for a name filter is the name of the class, interface, trait, etc...  including the full namespace. If at least one registered filter function returns `false` for a particular name, that name
 is guaranteed to not appear in the results. Note that the file in which a filtered definition appears may still be in the list if other non-filtered definitions are also in said file.
 If you would like to guarantee a file to be skipped, define a file name filter.
 
@@ -76,7 +76,7 @@ If you would like to guarantee a file to be skipped, define a file name filter.
 In this example, a simple regular expression is used to filter both file names and class names.
 ```php
 use HackPack\Scanner\ClassScanner;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 $includes = Set{...};
 $excludes = Set{...};
@@ -87,17 +87,17 @@ $classFilter = $className ==> preg_match(‘/pattern/’, $className);
 $fileFilter = $fileName ==> preg_match(‘/pattern/’, $fileName);
 
 // Attach the filters
-$scanner->addDefinitionNameFilter(DefinitionType::CLASS_DEF, $classFilter);
+$scanner->addDefinitionNameFilter(NameType::CLASS_DEF, $classFilter);
 $scanner->addFileNameFilter($fileFilter);
 
 // Retreive the class definitions
-$classMap = $scanner->mapDefinitionToFile(DefinitionType::CLASS_DEF);
+$classMap = $scanner->mapDefinitionToFile(NameType::CLASS_DEF);
 ```
 
 In this example, we are specifically looking for XHP classes, using the assumption that all XHP classes are defined in `.xhp` files.
 ```php
 use HackPack\Scanner\ClassScanner;
-use HackPack\Scanner\DefinitionType;
+use HackPack\Scanner\NameType;
 
 $includes = Set{...};
 $excludes = Set{...};
@@ -108,7 +108,7 @@ $classFilter = $className ==> substr($className, 0, 4) === 'xhp_';
 $fileFilter = $fileName ==> substr($fileName, -4) === '.xhp';
 
 // Attach the filters
-$scanner->addDefinitionNameFilter(DefinitionType::CLASS_DEF, $classFilter);
+$scanner->addNameFilter(NameType::CLASS_DEF, $classFilter);
 $scanner->addFileNameFilter($fileFilter);
 
 // Retreive the class definitions
