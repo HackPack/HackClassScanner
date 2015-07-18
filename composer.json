@@ -1,6 +1,7 @@
 {
     "name": "hackpack/hack-class-scanner",
     "description": "Recursively scan a directory for hack classes and/or interfaces",
+    "homepage": "https://github.com/HackPack/HackClassScanner",
     "license": "MIT",
     "type": "library",
     "keywords": ["hack", "hhvm", "scan", "ClassScanner", "autoload"],
@@ -9,6 +10,10 @@
             "name": "Isaac Leinweber",
             "email": "brotchen@gmail.com",
             "role": "Author"
+        },
+        {
+            "name": "Fred Emmott",
+            "role": "Contributor"
         }
     ],
     "minimum-stability" : "stable",
