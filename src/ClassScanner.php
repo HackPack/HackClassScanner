@@ -122,6 +122,36 @@ final class ClassScanner
         );
     }
 
+    /**
+     * Get an array appropriate for passing to autoload_set_paths
+     *
+     * Since all file names will include the full path, you should not set the second parameter of autoload_set_paths
+     * The closure passed in will be set to the 'failure' key
+     */
+    public function getAutoloadArray(
+        (function(string, string):void) $onFail = ($name, $file) ==> {},
+    ) : array<string,mixed>
+    {
+        $this->process();
+        return [
+            'class' =>
+                $this->definitions->at(NameType::CLASS_DEF)
+                ->setAll($this->definitions->at(NameType::INTERFACE_DEF))
+                ->setAll($this->definitions->at(NameType::TRAIT_DEF))
+                ->toArray(),
+
+            'type' =>
+                $this->definitions->at(NameType::TYPE_DEF)
+                ->setAll($this->definitions->at(NameType::NEWTYPE_DEF))
+                ->toArray(),
+
+            'function' => $this->definitions->at(NameType::FUNCTION_DEF)->toArray(),
+            'constant' => $this->definitions->at(NameType::CONST_DEF)->toArray(),
+
+            'failure'  => $onFail,
+        ];
+    }
+
     ///// Implementation /////
 
     <<__Memoize>>
