@@ -58,7 +58,7 @@ You can filter the results based on the name of the definition and/or the name o
 
 ### File Name Filters
 
-To register a definition name filter, call `ClassScanner->addFileNameFilter()` with the filter callback (see example below).
+To register a file name filter, call `ClassScanner->addFileNameFilter()` with the filter callback (see example below).
 
 The input for a file name filter is the full path to the file (via `realpath`).  If all registered filter functions return `true` for a particular file name, the file will be scanned.
 If at least one registered file filter returns `false`, the file will not be read (via `file_get_contents`).
