@@ -135,18 +135,18 @@ final class ClassScanner
         $this->process();
         return [
             'class' =>
-                $this->definitions->at(NameType::CLASS_DEF)
-                ->setAll($this->definitions->at(NameType::INTERFACE_DEF))
-                ->setAll($this->definitions->at(NameType::TRAIT_DEF))
+                $this->definitions->at(NameType::className)
+                ->setAll($this->definitions->at(NameType::interfaceName))
+                ->setAll($this->definitions->at(NameType::traitName))
                 ->toArray(),
 
             'type' =>
-                $this->definitions->at(NameType::TYPE_DEF)
-                ->setAll($this->definitions->at(NameType::NEWTYPE_DEF))
+                $this->definitions->at(NameType::typeName)
+                ->setAll($this->definitions->at(NameType::newtypeName))
                 ->toArray(),
 
-            'function' => $this->definitions->at(NameType::FUNCTION_DEF)->toArray(),
-            'constant' => $this->definitions->at(NameType::CONST_DEF)->toArray(),
+            'function' => $this->definitions->at(NameType::functionName)->toArray(),
+            'constant' => $this->definitions->at(NameType::constantName)->toArray(),
 
             'failure'  => $onFail,
         ];

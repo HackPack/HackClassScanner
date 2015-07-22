@@ -22,7 +22,7 @@ final class MultiNamespacePHPTest extends \PHPUnit_Framework_TestCase implements
             'Herp\\Derp',
             'EmptyNamespace',
         };
-        $actual = $this->parser->get(NameType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::className);
         $this->assertEquals($expected, $actual);
     }
 }

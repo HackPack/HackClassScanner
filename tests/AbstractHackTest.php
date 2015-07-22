@@ -21,7 +21,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'xhp_foo',
             $this->getPrefix().'xhp_foo__bar',
         };
-        $actual = $this->parser->get(NameType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::className);
     }
 
     <<Test>>
@@ -30,7 +30,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MyType',
             $this->getPrefix().'MyGenericType',
         };
-        $actual = $this->parser->get(NameType::TYPE_DEF);
+        $actual = $this->parser->get(NameType::typeName);
         $this->assertEquals($expected, $actual);
     }
 
@@ -40,7 +40,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MyNewtype',
             $this->getPrefix().'MyGenericNewtype',
         };
-        $actual = $this->parser->get(NameType::NEWTYPE_DEF);
+        $actual = $this->parser->get(NameType::newtypeName);
         $this->assertEquals($expected, $actual);
     }
 
@@ -49,7 +49,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
         $expected = Vector {
             $this->getPrefix().'MyEnum',
         };
-        $actual = $this->parser->get(NameType::ENUM_DEF);
+        $actual = $this->parser->get(NameType::enumName);
         $this->assertEquals($expected, $actual);
     }
 
@@ -63,7 +63,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'generic_function',
             $this->getPrefix().'byref_return_function',
         };
-        $actual = $this->parser->get(NameType::FUNCTION_DEF);
+        $actual = $this->parser->get(NameType::functionName);
         $this->assertEquals($expected, $actual);
     }
 
@@ -77,7 +77,7 @@ abstract class AbstractHackTest extends \PHPUnit_Framework_TestCase implements H
             $this->getPrefix().'MY_OTHER_OLD_STYLE_CONST',
             $this->getPrefix().'NOW_IM_JUST_FUCKING_WITH_YOU',
         };
-        $actual = $this->parser->get(NameType::CONST_DEF);
+        $actual = $this->parser->get(NameType::constantName);
         $this->assertEquals($expected, $actual);
     }
 }

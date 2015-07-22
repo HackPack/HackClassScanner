@@ -23,8 +23,8 @@ final class CurlyTest extends \PHPUnit_Framework_TestCase
     {
         $p = new FileParser(file_get_contents(self::DATA_FILE));
 
-        $this->assertEquals(Vector{'Foo'}, $p->get(NameType::CLASS_DEF));
-        $this->assertEquals(Vector{'my_func'}, $p->get(NameType::FUNCTION_DEF));
+        $this->assertEquals(Vector{'Foo'}, $p->get(NameType::className));
+        $this->assertEquals(Vector{'my_func'}, $p->get(NameType::functionName));
     }
 
     // Actually testing the tokenizer hasn't changed

@@ -37,14 +37,14 @@ $scanner = new ClassScanner(
   Set{‘other/directory/to/ignore’, ‘other/directory/file_to_ignore.txt’}
 );
 
-$classes = $scanner->getNameToFileMap(NameType::CLASS_DEF);
-$interfaces = $scanner->getNameToFileMap(NameType::INTERFACE_DEF);
-$traits = $scanner->getNameToFileMap(NameType::TRAIT_DEF);
-$enums = $scanner->getNameToFileMap(NameType::ENUM_DEF);
-$types = $scanner->getNameToFileMap(NameType::TYPE_DEF);
-$newtypes = $scanner->getNameToFileMap(NameType::NEWTYPE_DEF);
-$functions = $scanner->getNameToFileMap(NameType::FUNCTION_DEF);
-$constants = $scanner->getNameToFileMap(NameType::CONST_DEF);
+$classes = $scanner->getNameToFileMap(NameType::className);
+$interfaces = $scanner->getNameToFileMap(NameType::interfaceName);
+$traits = $scanner->getNameToFileMap(NameType::traitName);
+$enums = $scanner->getNameToFileMap(NameType::enumName);
+$types = $scanner->getNameToFileMap(NameType::typeName);
+$newtypes = $scanner->getNameToFileMap(NameType::newtypeName);
+$functions = $scanner->getNameToFileMap(NameType::functionName);
+$constants = $scanner->getNameToFileMap(NameType::constantName);
 ```
 
 The `getNameToFileMap` method takes one parameter specifying the type of the definition desired.  `getNameToFileMap` will return a `Map<string,string>` where the keys are the names of the classes, interfaces, traits, etc...
@@ -87,11 +87,11 @@ $classFilter = $className ==> preg_match(‘/pattern/’, $className);
 $fileFilter = $fileName ==> preg_match(‘/pattern/’, $fileName);
 
 // Attach the filters
-$scanner->addDefinitionNameFilter(NameType::CLASS_DEF, $classFilter);
+$scanner->addDefinitionNameFilter(NameType::className, $classFilter);
 $scanner->addFileNameFilter($fileFilter);
 
 // Retreive the class definitions
-$classMap = $scanner->mapDefinitionToFile(NameType::CLASS_DEF);
+$classMap = $scanner->mapDefinitionToFile(NameType::className);
 ```
 
 In this example, we are specifically looking for XHP classes, using the assumption that all XHP classes are defined in `.xhp` files.
@@ -108,7 +108,7 @@ $classFilter = $className ==> substr($className, 0, 4) === 'xhp_';
 $fileFilter = $fileName ==> substr($fileName, -4) === '.xhp';
 
 // Attach the filters
-$scanner->addNameFilter(NameType::CLASS_DEF, $classFilter);
+$scanner->addNameFilter(NameType::className, $classFilter);
 $scanner->addFileNameFilter($fileFilter);
 
 // Retreive the class definitions

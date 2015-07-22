@@ -18,7 +18,7 @@ final class FunctionNotDefinitionTest extends \PHPUnit_Framework_TestCase
         $p = new FileParser('<?hh function foo();');
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
     }
 
@@ -27,22 +27,22 @@ final class FunctionNotDefinitionTest extends \PHPUnit_Framework_TestCase
         $p = new FileParser('<?hh newtype Foo = function(int): void;');
         $this->assertEquals(
             Vector{},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
         $this->assertEquals(
             Vector{'Foo'},
-            $p->get(NameType::NEWTYPE_DEF),
+            $p->get(NameType::newtypeName),
         );
 
         // Add extra whitespace
         $p = new FileParser('<?hh newtype Foo = function (int): void;');
         $this->assertEquals(
             Vector{},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
         $this->assertEquals(
             Vector{'Foo'},
-            $p->get(NameType::NEWTYPE_DEF),
+            $p->get(NameType::newtypeName),
         );
     }
 
@@ -55,7 +55,7 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
     }
 
@@ -64,7 +64,7 @@ EOF
         $p = new FileParser('<?hh function foo((function():void) $callback) { }');
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
     }
 
@@ -80,7 +80,7 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
     }
 
@@ -94,13 +94,13 @@ EOF
     );
         $this->assertEquals(
             Vector{'foo'},
-            $p->get(NameType::FUNCTION_DEF),
+            $p->get(NameType::functionName),
         );
     }
 
     <<Test>>
     public function testAsRVal() : void {
         $p = new FileParser('<?php $f = function(){};');
-        $this->assertTrue($p->get(NameType::FUNCTION_DEF)->isEmpty());
+        $this->assertTrue($p->get(NameType::functionName)->isEmpty());
     }
 }

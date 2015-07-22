@@ -18,7 +18,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
             $this->getPrefix().'SimpleAbstractClass',
             $this->getPrefix().'SimpleFinalClass',
         };
-        $actual = $this->parser->get(NameType::CLASS_DEF);
+        $actual = $this->parser->get(NameType::className);
         $this->assertEquals($expected, $actual);
     }
 
@@ -27,7 +27,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
         $expected = Vector{
             $this->getPrefix().'SimpleInterface',
         };
-        $actual = $this->parser->get(NameType::INTERFACE_DEF);
+        $actual = $this->parser->get(NameType::interfaceName);
         $this->assertEquals($expected, $actual);
     }
 
@@ -36,7 +36,7 @@ abstract class AbstractPHPTest extends \PHPUnit_Framework_TestCase implements Ha
         $expected = Vector{
             $this->getPrefix().'SimpleTrait'
         };
-        $actual = $this->parser->get(NameType::TRAIT_DEF);
+        $actual = $this->parser->get(NameType::traitName);
         $this->assertEquals($expected, $actual);
     }
 }

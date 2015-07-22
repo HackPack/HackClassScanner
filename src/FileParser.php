@@ -30,21 +30,21 @@ class FileParser implements DefinitionFinder
   public function get(NameType $type) : \ConstVector<string>
   {
       switch($type) {
-      case NameType::CLASS_DEF:
+      case NameType::className:
           return $this->classes;
-      case NameType::INTERFACE_DEF:
+      case NameType::interfaceName:
           return $this->interfaces;
-      case NameType::TRAIT_DEF:
+      case NameType::traitName:
           return $this->traits;
-      case NameType::ENUM_DEF :
+      case NameType::enumName :
           return $this->enums;
-      case NameType::TYPE_DEF :
+      case NameType::typeName :
           return $this->types;
-      case NameType::NEWTYPE_DEF :
+      case NameType::newtypeName :
           return $this->newtypes;
-      case NameType::FUNCTION_DEF :
+      case NameType::functionName :
           return $this->functions;
-      case NameType::CONST_DEF :
+      case NameType::constantName :
           return $this->constants;
       }
   }
@@ -110,20 +110,20 @@ class FileParser implements DefinitionFinder
     $this->consumeWhitespace();
 
     switch ($def_type) {
-      case NameType::CLASS_DEF:
-      case NameType::INTERFACE_DEF:
-      case NameType::TRAIT_DEF:
+      case NameType::className:
+      case NameType::interfaceName:
+      case NameType::traitName:
         $this->consumeClassDefinition($def_type);
         return;
-      case NameType::FUNCTION_DEF:
+      case NameType::functionName:
         $this->consumeFunctionDefinition();
         return;
-      case NameType::CONST_DEF:
+      case NameType::constantName:
         $this->consumeConstantDefinition();
         return;
-      case NameType::TYPE_DEF:
-      case NameType::NEWTYPE_DEF:
-      case NameType::ENUM_DEF:
+      case NameType::typeName:
+      case NameType::newtypeName:
+      case NameType::enumName:
         $this->consumeSimpleDefinition($def_type);
         return;
     }
@@ -275,7 +275,7 @@ class FileParser implements DefinitionFinder
         $this->file,
       );
       invariant(
-        $def_type === NameType::CLASS_DEF,
+        $def_type === NameType::className,
         'Seeing an XHP class name for a %s in %s',
         token_name($def_type),
         $this->file,
@@ -285,13 +285,13 @@ class FileParser implements DefinitionFinder
     }
     $fqn = $this->namespace.$name;
     switch ($def_type) {
-      case NameType::CLASS_DEF:
+      case NameType::className:
         $this->classes[] = $fqn;
         break;
-      case NameType::INTERFACE_DEF:
+      case NameType::interfaceName:
         $this->interfaces[] = $fqn;
         break;
-      case NameType::TRAIT_DEF:
+      case NameType::traitName:
         $this->traits[] = $fqn;
         break;
       default:
@@ -314,13 +314,13 @@ class FileParser implements DefinitionFinder
     );
     $fqn = $this->namespace.$next;
     switch ($def_type) {
-      case NameType::TYPE_DEF:
+      case NameType::typeName:
         $this->types[] = $fqn;
         break;
-      case NameType::NEWTYPE_DEF:
+      case NameType::newtypeName:
         $this->newtypes[] = $fqn;
         break;
-      case NameType::ENUM_DEF:
+      case NameType::enumName:
         $this->enums[] = $fqn;
         $this->skipToAndConsumeBlock();
         return;
