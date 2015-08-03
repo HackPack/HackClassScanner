@@ -138,6 +138,7 @@ final class ClassScanner
                 $this->definitions->at(NameType::className)
                 ->setAll($this->definitions->at(NameType::interfaceName))
                 ->setAll($this->definitions->at(NameType::traitName))
+                ->setAll($this->definitions->at(NameType::enumName))
                 ->toArray(),
 
             'type' =>
