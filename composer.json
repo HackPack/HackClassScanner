@@ -18,8 +18,7 @@
     ],
     "minimum-stability" : "stable",
     "require-dev": {
-        "phpunit/phpunit": "^4.7",
-        "91carriage/phpunit-hhi": "^4.5"
+        "phpunit/phpunit": "^4.7"
     },
     "autoload": {
         "psr-4": {
@@ -32,6 +31,7 @@
         }
     },
     "require": {
-        "hhvm": "*"
+        "hhvm": "*",
+        "91carriage/phpunit-hhi": "^4.5"
     }
 }
